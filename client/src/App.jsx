@@ -4,7 +4,7 @@ import { Route, Routes, useLocation } from "react-router-dom";
 import Hero from "./components/Hero";
 import Footer from "./components/Footer";
 import Home from "./pages/Home";
-import FooterCopy from "./components/FooterCopy";
+import AllRooms from "./pages/AllRooms";
 
 const App = () => {
   const isOwnerPath = useLocation().pathname.includes("owner");
@@ -13,11 +13,14 @@ const App = () => {
     <div>
       {!isOwnerPath && <Navbar />}
 
-      <Routes>
-        <Route path="/" element={<Home />} />
-      </Routes>
+      <div className="min-h-[70vh]">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/rooms" element={<AllRooms />} />
+        </Routes>
+      </div>
 
-      <FooterCopy />
+      <Footer />
     </div>
   );
 };
