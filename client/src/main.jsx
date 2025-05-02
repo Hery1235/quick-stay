@@ -18,11 +18,6 @@ createRoot(document.getElementById("root")).render(
   <ClerkProvider publishableKey={PUBLISHABLE_KEY} afterSignOutUrl="/">
     <BrowserRouter>
       <App />
-      <div className="h-[70vh]">
-        <Routes>
-          <Route path="/" element={<Home />} />
-        </Routes>
-      </div>
     </BrowserRouter>
   </ClerkProvider>
 );
