@@ -20,7 +20,7 @@ const RadioButton = ({ label, selected = false, onChange = () => {} }) => {
   return (
     <label className="flex gap-3 items-center cursor-pointer mt-2 text-sm">
       <input
-        type="checkbox"
+        type="radio"
         name="sortOptions"
         checked={selected}
         onChange={(e) => onChange(label)}
@@ -119,7 +119,7 @@ const AllRooms = () => {
         ))}
       </div>
       {/*Filters */}
-      <div className="bg-white w-80 border border-gray-300 text-gray-600 max-lg:mb-8 min-lg:mt-16">
+      <div className="bg-white w-80 border border-gray-300 text-gray-600 max-lg:mb-8 min-lg:mt-16 xl:fixed xl:top-24 xl:right-24 xl:z-[-50]">
         <div
           className={`flex items-center justify-between px-5 py-2.5 min-lg:border-b border-gray-300 ${
             openFilters && "border-b"
