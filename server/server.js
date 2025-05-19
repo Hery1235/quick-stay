@@ -13,7 +13,7 @@ app.use(cors());
 app.use(express.json());
 app.use(clerkMiddleware());
 // Api to listen clerk web hooks
-app.use("api/clerk", clerkWebHooks);
+app.use("/api/clerk", clerkWebHooks);
 app.get("/", (req, res) => {
   res.send("The backennd is workiong ginddde ");
 });
