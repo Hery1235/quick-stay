@@ -6,9 +6,9 @@ const HotelCard = ({ room, index }) => {
   return (
     <Link
       className="relative max-w-70 w-full rounded-xl overflow-hidden bg-white text-grey-500/90 shadow-[0px_4px_4px_rgba(0,0,0,0.05)]"
-      to={"/rooms/" + room.id}
+      to={"/rooms/" + room._id}
       onClick={() => scrollTo(0, 0)}
-      key={room.id}
+      key={room._id}
     >
       <img src={room.images[0]} alt="" />
 

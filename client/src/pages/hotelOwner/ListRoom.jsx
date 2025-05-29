@@ -1,10 +1,56 @@
 import React, { useState } from "react";
 import { roomsDummyData } from "../../assets/assets";
 import Title from "../../components/Title";
+import { useAppContext } from "../../context/AppContext";
+import toast from "react-hot-toast";
+import { useEffect } from "react";
 
 const ListRoom = () => {
+  const { axios, getToken, user } = useAppContext();
   const [rooms, setRooms] = useState(roomsDummyData);
 
+  const fetchOwnerRooms = async () => {
+    try {
+      const { data } = await axios.get("/api/rooms/owner", {
+        headers: {
+          Authorization: `Bearer ${await getToken()}`,
+        },
+      });
+
+      if (data.success) {
+        setRooms(data.rooms);
+      } else {
+        toast.error(error.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+
+  //Toggle Availibility
+  const toggleAvialibility = async (roomId) => {
+    try {
+      const { data } = await axios.post(
+        "/api/rooms/toggle-availibility",
+        { roomId },
+        {
+          headers: { Authorization: `Bearer ${await getToken()}` },
+        }
+      );
+      if (data.success) {
+        toast.success(data.message);
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+  useEffect(() => {
+    if (user) {
+      fetchOwnerRooms();
+    }
+  }, [user]);
   return (
     <div>
       <Title
@@ -49,6 +95,7 @@ const ListRoom = () => {
                 <td className="py-3 px-4 text-red-500 border-t border-gray-300 text-sm text-center">
                   <label className="relative inline-flex items-center cursor-pointer text-gray-900 gap-3">
                     <input
+                      onChange={() => toggleAvialibility(item._id)}
                       className="sr-only peer "
                       type="checkbox"
                       checked={item.isAvailable}

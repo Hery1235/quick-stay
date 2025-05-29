@@ -7,15 +7,17 @@ import {
   roomCommonData,
 } from "../assets/assets";
 import StarRating from "../components/StarRating";
+import { useAppContext } from "../context/AppContext";
 
 const RoomDetails = () => {
   const { id } = useParams();
   console.log("Key for the given click is ", id);
   const [room, setRoom] = useState(null);
   const [mainImage, setMainImage] = useState(null);
+  const { allRooms } = useAppContext();
 
   useEffect(() => {
-    const room = roomsDummyData.find((room) => room._id === id);
+    const room = allRooms.find((room) => room._id === id);
     room && setRoom(room);
     room && setMainImage(room.images[0]);
   }, []);

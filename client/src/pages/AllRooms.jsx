@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { assets, facilityIcons, roomsDummyData } from "../assets/assets";
 import StarRating from "../components/StarRating";
 import { useNavigate } from "react-router-dom";
+import { useAppContext } from "../context/AppContext";
 
 const CheckBox = ({ label, selected = false, onChange = () => {} }) => {
   return (
@@ -31,6 +32,8 @@ const RadioButton = ({ label, selected = false, onChange = () => {} }) => {
 };
 
 const AllRooms = () => {
+  const { allRooms } = useAppContext();
+
   const [openFilters, setOpemFilters] = useState(false);
   const navigate = useNavigate();
   const roomTypes = [
@@ -62,7 +65,7 @@ const AllRooms = () => {
             enhance your stay and create unforgettable memories.
           </p>
         </div>
-        {roomsDummyData.map((room) => (
+        {allRooms.map((room) => (
           <div
             key={room._id}
             className="flex flex-col md:flex-row items-start py-10 gap-6 border-b border-gray-300 last:pb-30 last-border-0"

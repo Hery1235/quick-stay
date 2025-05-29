@@ -59,12 +59,30 @@ const AddRoom = () => {
         headers: { Authorization: `Bearer ${await getToken()}` },
       });
       if (data.success) {
-        return toast.success("Room Successfully added");
+        toast.success("Room Successfully added");
+        setImages({
+          1: null,
+          2: null,
+          3: null,
+          4: null,
+        });
+        setInputs({
+          roomType: "",
+          pricePerNight: 0,
+          amenties: {
+            "Free Wifi": false,
+            "Free Breakfast": false,
+            "Room Service": false,
+            "Pool Access": false,
+          },
+        });
       } else {
-        return toast.error("Room Registeration Failed");
+        toast.error("Room Registeration Failed");
       }
     } catch (error) {
       toast.error(error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -168,8 +186,11 @@ const AddRoom = () => {
         ))}
       </div>
       {/*                   Add Room Button  */}
-      <button className="bg-primary text-white px-8 py-2 rounded mt-8 cursor-pointer">
-        Add Room
+      <button
+        className="bg-primary text-white px-8 py-2 rounded mt-8 cursor-pointer"
+        disabled={loading}
+      >
+        {loading ? "Adding" : "Add Room"}
       </button>
     </form>
   );
