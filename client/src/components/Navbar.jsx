@@ -38,6 +38,7 @@ const Navbar = () => {
   const { openSignIn } = useClerk();
   // const { user } = useUser();
   const { user, navigate, isOwner, setShowHotelReg } = useAppContext();
+  console.log(isOwner);
   // const navigate = useNavigate();
   const location = useLocation();
 
@@ -184,7 +185,7 @@ const Navbar = () => {
         {user && (
           <button
             onClick={() => {
-              navigate("/owner");
+              isOwner ? navigate("/owner") : setShowHotelReg(true);
             }}
             className="border px-4 py-1 text-sm font-light rounded-full cursor-pointer transition-all"
           >

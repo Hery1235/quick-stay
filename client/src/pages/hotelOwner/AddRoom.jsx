@@ -1,8 +1,12 @@
 import React, { useState } from "react";
 import Title from "../../components/Title";
 import { assets } from "../../assets/assets";
+import { useAppContext } from "../../context/AppContext";
+import toast from "react-hot-toast";
 
 const AddRoom = () => {
+  const { axios, getToken } = useAppContext();
+
   const [images, setImages] = useState({
     1: null,
     2: null,
@@ -21,8 +25,56 @@ const AddRoom = () => {
     },
   });
 
+  const [loading, setLoading] = useState(false);
+
+  const addRoom = async (e) => {
+    e.preventDefault();
+    if (
+      !inputs.roomType ||
+      !inputs.pricePerNight ||
+      !inputs.amenties ||
+      !Object.values(images).some((image) => image)
+    ) {
+      toast.error("Please provide all the details");
+      return;
+    }
+    setLoading(true);
+    try {
+      const formData = new FormData();
+      formData.append("roomType", inputs.roomType);
+      formData.append("pricePerNight", inputs.pricePerNight);
+
+      //Converting Amenities To Array & Keeping only enabled amenties
+      const amenities = Object.keys(inputs.amenties).filter(
+        (key) => inputs.amenties[key]
+      );
+      formData.append("amenities", JSON.stringify(amenities));
+
+      //Adding images to form data
+      Object.keys(images).forEach((key) => {
+        images[key] && formData.append("images", images[key]);
+      });
+
+      const { data } = await axios.post("/api/rooms", formData, {
+        headers: { Authorization: `Bearer ${await getToken()}` },
+      });
+      if (data.success) {
+        return toast.success("Room Successfully added");
+      } else {
+        return toast.error("Room Registeration Failed");
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+
   return (
-    <form>
+    <form
+      onSubmit={addRoom}
+      onClick={(e) => {
+        e.stopPropagation();
+      }}
+    >
       <Title
         font="outfit"
         align="left"
@@ -115,6 +167,7 @@ const AddRoom = () => {
           </div>
         ))}
       </div>
+      {/*                   Add Room Button  */}
       <button className="bg-primary text-white px-8 py-2 rounded mt-8 cursor-pointer">
         Add Room
       </button>

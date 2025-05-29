@@ -28,12 +28,12 @@ app.get("/", (req, res) => {
 // Api to get user hooks
 app.use("/api/user", userRouter);
 // Api to get Hotel hooks
-app.use("api/hotels", hotelRouter);
+app.use("/api/hotels", hotelRouter);
 // Api to get Room hooks
-app.use("api/rooms", roomRouter);
+app.use("/api/rooms", roomRouter);
 
 // Api to get bookings hooks
-app.use("api/bookings", bookingRouter);
+app.use("/api/bookings", bookingRouter);
 
 app.listen(PORT, () => {
   console.log(`App is runndding on ${PORT}`);
