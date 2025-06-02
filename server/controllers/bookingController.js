@@ -39,37 +39,60 @@ export const checkAvailibiltyApi = async (req, res) => {
 
 export const createBooking = async (req, res) => {
   try {
-    const { room, checkInDate, checkOutDate, guest } = req.body;
+    const { room, checkInDate, checkOutDate, guests } = req.body;
+    console.log(req.body);
     const user = req.user._id;
-    const isAvailible = await checkAvailibilty({
+
+    // Check availability
+    const isAvailable = await checkAvailibilty({
       room,
       checkInDate,
       checkOutDate,
     });
 
-    if (!isAvailible) {
-      return res.json({ success: false, messsage: "Room Is Not Availible" });
+    if (!isAvailable) {
+      return res.json({ success: false, message: "Room is not available" });
     }
 
-    // Find Total price
+    // Find Room and Hotel data
     const roomData = await Room.findById(room).populate("hotel");
-    const totalPrice = roomData.pricePerNight;
+    if (!roomData) {
+      return res.json({ success: false, message: "Room not found" });
+    }
+
     const checkIn = new Date(checkInDate);
     const checkOut = new Date(checkOutDate);
+
+    if (isNaN(checkIn) || isNaN(checkOut) || checkOut <= checkIn) {
+      return res.json({
+        success: false,
+        message: "Invalid check-in or check-out dates",
+      });
+    }
+
+    // Calculate number of nights
+    const timeDiff = checkOut.getTime() - checkIn.getTime();
     const nights = Math.ceil(timeDiff / (1000 * 3600 * 24));
 
-    totalPrice *= nights;
+    // Calculate total price
+    let totalPrice = roomData.pricePerNight * nights;
 
+    // Create booking
     const booking = await Booking.create({
       user,
       room,
       hotel: roomData.hotel._id,
-      guest: +guest,
+      guests: +guests,
       checkInDate,
       checkOutDate,
       totalPrice,
     });
-    res.json({ success: true, message: "Booking Created Successfully" });
+
+    res.json({
+      success: true,
+      message: "Booking created successfully",
+      booking,
+    });
   } catch (error) {
     res.json({ success: false, message: error.message });
   }
@@ -81,7 +104,7 @@ export const getBookingForUser = async (req, res) => {
   try {
     const user = req.user._id;
 
-    const booking = Booking.find({ user })
+    const booking = await Booking.find({ user })
       .populate("room hotel")
       .sort({ createdAt: -1 });
 

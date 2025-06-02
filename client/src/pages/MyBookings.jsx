@@ -1,13 +1,33 @@
 import React, { useEffect, useState } from "react";
 import Title from "../components/Title";
 import { assets, userBookingsDummyData } from "../assets/assets";
+import { useAppContext } from "../context/AppContext";
 
 const MyBookings = () => {
-  const [bookinData, setBookingData] = useState(userBookingsDummyData);
+  const [bookinData, setBookingData] = useState([]);
+  const { axios, getToken, user } = useAppContext();
 
-  // useEffect(()=>{
-  //       setBookingData(userBookingsDummyData);
-  // },[bookinData])
+  const getBookingData = async () => {
+    try {
+      const { data } = await axios("/api/bookings/user", {
+        headers: {
+          Authorization: `Bearer ${await getToken()}`,
+        },
+      });
+      if (data.success) {
+        setBookingData(data.booking);
+      } else {
+        console.log(data.message);
+      }
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+  useEffect(() => {
+    if (user) {
+      getBookingData();
+    }
+  }, [user]);
   return (
     <div className="py-28 md:pb-35 md:pt-32 px-4 md:px-16 lg:px-24 xl:px-32">
       <Title
@@ -35,7 +55,7 @@ const MyBookings = () => {
               />
               <div className="flex flex-col gap-1.5 max-md:mt-3 min-md:ml-4">
                 <p className="font-playfair text-2xl">
-                  {booking.hotel.name}
+                  {booking.hotel.name + " "}
                   <span className="font-inter text-sm">
                     ({booking.room.roomType})
                   </span>

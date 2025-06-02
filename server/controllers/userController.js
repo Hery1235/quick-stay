@@ -2,8 +2,8 @@
 export const getUserData = async (req, res) => {
   try {
     const role = req.user.role;
-    const recentSearchedCities = req.user.recentSearchedCities;
-    res.json({ success: true, role, recentSearchedCities });
+    const recentSearchCities = req.user.recentSearchCities;
+    res.json({ success: true, role, recentSearchCities });
   } catch (error) {
     res.json({ success: false, message: error.message });
   }
@@ -13,13 +13,15 @@ export const getUserData = async (req, res) => {
 
 export const storeUserSearchCities = async (req, res) => {
   try {
+    console.log("Trying oo update search cities");
     const { recentSearchCity } = req.body;
+    console.log(recentSearchCity);
     const user = req.user;
-    if (user.recentSearchedCities.length < 3) {
-      user.recentSearchedCities.push(recentSearchCity);
+    if (user.recentSearchCities.length < 3) {
+      user.recentSearchCities.push(recentSearchCity);
     } else {
-      user.recentSearchedCities.shift();
-      user.recentSearchedCities.push(recentSearchCity);
+      user.recentSearchCities.shift();
+      user.recentSearchCities.push(recentSearchCity);
     }
 
     await user.save();

@@ -1,41 +1,40 @@
-import React from "react";
+import React, { useState } from "react";
 import { assets, cities } from "../assets/assets";
 import { useAuth } from "@clerk/clerk-react";
+import { useAppContext } from "../context/AppContext";
 
 const Hero = () => {
-  const { getToken, isSignedIn } = useAuth();
-  const handleClick = async () => {
-    if (!isSignedIn) {
-      alert("Please sign in first.");
-      return;
-    }
+  const [destination, setDestination] = useState("");
+  const { navigate, axios, getToken, setSearchCities } = useAppContext();
+  const onSearch = async (e) => {
+    e.preventDefault();
+    navigate(`/rooms?destination=${destination}`);
 
-    try {
-      const token = await getToken();
-      const res = await fetch("http://localhost:3000/api/user", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+    // API to save recently searched city
+    await axios.post(
+      "/api/user/store-recent-search",
+      { recentSearchCity: destination },
+      {
+        headers: { Authorization: `Bearer ${await getToken()}` },
+      }
+    );
 
-      const data = await res.json();
-      alert(JSON.stringify(data, null, 2));
-    } catch (err) {
-      alert("Error: " + err.message);
-    }
+    // Add destination to recent search cities (max 3)
+    setSearchCities((prevSearchCities = []) => {
+      const updatedSearchCities = [...prevSearchCities, destination];
+      if (updatedSearchCities.length > 3) {
+        updatedSearchCities.shift();
+      }
+      return updatedSearchCities;
+    });
   };
+
   return (
     <div className="flex flex-col items-start justify-center px-6 md:px-16 lg:px-24 xl:px-32 text-white bg-[url('/src/assets/heroImage.png')] bg-no-repeat bg-cover bg-center h-screen">
       <p className="bg-[#49B9FF]/50 px-3.5 py-1 rounded-full mt-20">
         The Ultimate Hotel Experience
       </p>
-      <button
-        onClick={() => {
-          handleClick();
-        }}
-      >
-        Get User data
-      </button>
+
       <h1 className="font-playfair text-2xl md:text-5xl md:text-[56px] md:leading-[56px] font-bold md:font-extrabold max-w-xl mt-4">
         Discover Your Perfect Gateway Destination{" "}
       </h1>
@@ -44,7 +43,10 @@ const Hero = () => {
         explore this is why we are here come and join us{" "}
       </p>
       {/* From  */}
-      <form className="bg-white text-gray-500 rounded-lg px-6 py-4 mt-2 flex flex-col md:flex-row max-md:items-start gap-4 max-md:mx-auto">
+      <form
+        onSubmit={onSearch}
+        className="bg-white text-gray-500 rounded-lg px-6 py-4 mt-2 flex flex-col md:flex-row max-md:items-start gap-4 max-md:mx-auto"
+      >
         {/* Input Cities   */}
         <div>
           <div className="flex items-center gap-2">
@@ -52,6 +54,8 @@ const Hero = () => {
             <label htmlFor="destinationInput">Destination</label>
           </div>
           <input
+            onChange={(e) => setDestination(e.target.value)}
+            value={destination}
             list="destinations"
             id="destinationInput"
             type="text"

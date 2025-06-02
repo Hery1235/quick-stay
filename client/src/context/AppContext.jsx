@@ -26,6 +26,7 @@ export const AppProvider = ({ children }) => {
       if (data.success) {
         setIsOwner(data.role === "hotelOwner");
         setSearchCities(data.recentSearchCities);
+        console.log(searchCities);
       } else {
         // Retry
         setTimeout(() => {

@@ -43,7 +43,7 @@ export const getRooms = async (req, res) => {
         select: "image",
       },
     });
-    console.log(roomData);
+
     res.json({ success: true, roomData });
   } catch (error) {
     res.json({ success: false, message: error.message });

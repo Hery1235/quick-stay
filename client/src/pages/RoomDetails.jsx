@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { data, useParams } from "react-router-dom";
 import {
   assets,
   facilityIcons,
@@ -8,14 +8,75 @@ import {
 } from "../assets/assets";
 import StarRating from "../components/StarRating";
 import { useAppContext } from "../context/AppContext";
+import toast from "react-hot-toast";
 
 const RoomDetails = () => {
   const { id } = useParams();
-  console.log("Key for the given click is ", id);
   const [room, setRoom] = useState(null);
+  const { allRooms, axios, getToken, navigate } = useAppContext();
   const [mainImage, setMainImage] = useState(null);
-  const { allRooms } = useAppContext();
+  const [checkInDate, setCheckInDate] = useState(null);
+  const [checkOutDate, setCheckOutDate] = useState(null);
+  const [guests, setGuests] = useState(1);
+  const [isAvailible, setIsAvailible] = useState(false);
 
+  const checkAvailibility = async () => {
+    // Check if the room is availible
+    try {
+      // Check is check in date is greater then check in date
+      if (checkInDate >= checkOutDate) {
+        toast.error("Check-In Date should be less then check-Out date ");
+        return;
+      }
+      const { data } = await axios.post("/api/bookings/check-availibility", {
+        room: id,
+        checkInDate,
+        checkOutDate,
+      });
+      if (data.success) {
+        if (data.isAvailible) {
+          setIsAvailible(true);
+          toast.success("Room is Availible");
+        } else {
+          setIsAvailible(false);
+          toast.error("Room is not Availible");
+        }
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+
+  // Function to check the avalibility and book the room
+
+  const onSumitHandler = async (e) => {
+    try {
+      e.preventDefault();
+      if (!isAvailible) {
+        return checkAvailibility();
+      } else {
+        const { data } = await axios.post(
+          "/api/bookings/book",
+          { room: id, checkInDate, checkOutDate, guests },
+          {
+            headers: {
+              Authorization: `Bearer ${await getToken()}`,
+            },
+          }
+        );
+        if (data.success) {
+          toast.success("Booking Created");
+          navigate("/my-bookings");
+        } else {
+          toast.error(data.message);
+        }
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
   useEffect(() => {
     const room = allRooms.find((room) => room._id === id);
     room && setRoom(room);
@@ -99,13 +160,19 @@ const RoomDetails = () => {
           <p className="text-2xl font-medium">${room.pricePerNight}/night</p>
         </div>
         {/*Check In form  */}
-        <form className="flex flex-col md:flex-row items-start md:items-center justify-between bg-white shadow-[0px_0px_20px_rgba(0,0,0,0.5)] p-6 rounded-xl mx-auto mt-16 max-w-6xl">
+        <form
+          onSubmit={(e) => onSumitHandler(e)}
+          className="flex flex-col md:flex-row items-start md:items-center justify-between bg-white shadow-[0px_0px_20px_rgba(0,0,0,0.5)] p-6 rounded-xl mx-auto mt-16 max-w-6xl"
+        >
           <div className="flex flex-col flex-wrap md:flex-row items-start md:items-center gap-4 md:gap-10 text-gray-500">
             <div className="flex flex-col">
               <label className="font-medium" htmlFor="checkInDate">
                 Check In
               </label>
               <input
+                onChange={(e) => setCheckInDate(e.target.value)}
+                value={checkInDate}
+                min={new Date().toISOString().split("T")[0]}
                 className="w-full rounded border border-gray-300 px-3 py-2 mt-1.5 outline-none"
                 required
                 type="date"
@@ -121,6 +188,10 @@ const RoomDetails = () => {
                 Check Out
               </label>
               <input
+                onChange={(e) => setCheckOutDate(e.target.value)}
+                value={checkOutDate}
+                disabled={!checkInDate}
+                min={checkInDate}
                 className="w-full rounded border border-gray-300 px-3 py-2 mt-1.5 outline-none"
                 required
                 type="date"
@@ -135,6 +206,8 @@ const RoomDetails = () => {
                 Guests
               </label>
               <input
+                onChange={(e) => setGuests(e.target.value)}
+                value={guests}
                 className="max-w-20 rounded border border-gray-300 px-3 py-2 mt-1.5 outline-none"
                 required
                 type="number"
@@ -148,7 +221,7 @@ const RoomDetails = () => {
             className="bg-primary hover:bg-primary-dull active:scale-95 transition-all text-white rounded-md max-md:w-full max-md:mt-6 md:px-25 py-3 md:py-4 text-base cursor-pointer"
             type="submit"
           >
-            Check Availibilty
+            {isAvailible ? "Book Now" : "Check Availibilty"}
           </button>
         </form>
         {/* Common specifications */}
