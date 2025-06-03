@@ -1,9 +1,9 @@
 import React from "react";
-import Navbar from "./components/navbar";
 import { Route, Routes, useLocation } from "react-router-dom";
 import Footer from "./components/Footer";
 import Home from "./pages/Home";
 import AllRooms from "./pages/AllRooms";
+import Navbar from "./components/Navbar";
 import RoomDetails from "./pages/RoomDetails";
 import MyBookings from "./pages/MyBookings";
 import HotelReg from "./components/HotelReg";
