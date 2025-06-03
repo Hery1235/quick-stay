@@ -147,7 +147,19 @@ export const stripePayment = async (req, res) => {
   try {
     const { bookingId } = req.body;
     const booking = await Booking.findById(bookingId);
+    if (!booking) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Booking not found" });
+    }
+
     const roomData = await Room.findById(booking.room).populate("hotel");
+    if (!roomData) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Room not found" });
+    }
+
     const totalPrice = booking.totalPrice;
     const { origin } = req.headers;
 
@@ -165,7 +177,7 @@ export const stripePayment = async (req, res) => {
         quantity: 1,
       },
     ];
-    // Create checkout Session
+
     const session = await stripeInstance.checkout.sessions.create({
       line_items,
       mode: "payment",
@@ -175,8 +187,10 @@ export const stripePayment = async (req, res) => {
         bookingId,
       },
     });
+
     res.json({ success: true, url: session.url });
   } catch (error) {
-    res.json({ success: false, message: "Payment Failded" });
+    console.error("Stripe Payment Error:", error.message);
+    res.status(500).json({ success: false, message: "Payment Failed" });
   }
 };
