@@ -21,7 +21,7 @@ app.use(cors());
 
 //Api to listen to stripe webhooks
 app.post(
-  "/api/webhook",
+  "/api/stripe",
   express.raw({ type: "application/json" }),
   stripeWebHooks
 );

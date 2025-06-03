@@ -30,6 +30,7 @@ export const stripeWebHooks = async (req, res) => {
 
     const session = sessions.data?.[0];
     const bookingId = session?.metadata?.bookingId;
+    console.log("Booking id is ", bookingId);
 
     if (bookingId) {
       await Booking.findByIdAndUpdate(bookingId, {

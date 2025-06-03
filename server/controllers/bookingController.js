@@ -146,7 +146,9 @@ export const getHotelBooking = async (req, res) => {
 export const stripePayment = async (req, res) => {
   try {
     const { bookingId } = req.body;
+
     const booking = await Booking.findById(bookingId);
+
     if (!booking) {
       return res
         .status(404)
@@ -154,6 +156,7 @@ export const stripePayment = async (req, res) => {
     }
 
     const roomData = await Room.findById(booking.room).populate("hotel");
+
     if (!roomData) {
       return res
         .status(404)
