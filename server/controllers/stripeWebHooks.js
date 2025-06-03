@@ -1,5 +1,5 @@
 import Stripe from "stripe";
-import Booking from "../models/Booking";
+import Booking from "../models/Booking.js";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
