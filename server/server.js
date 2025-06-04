@@ -20,11 +20,11 @@ const app = express();
 app.use(cors());
 
 //Api to listen to stripe webhooks
-app.post(
-  "/api/stripe",
-  express.raw({ type: "application/json" }),
-  stripeWebHooks
-);
+// app.post(
+//   "/api/stripe",
+//   express.raw({ type: "application/json" }),
+//   stripeWebHooks
+// );
 app.use(express.json());
 app.use(clerkMiddleware());
 
