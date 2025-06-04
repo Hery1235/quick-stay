@@ -10,7 +10,7 @@ import hotelRouter from "./routes/hotelRoutes.js";
 import connectCloudinary from "./configs/coudinary.js";
 import roomRouter from "./routes/roomRoutes.js";
 import bookingRouter from "./routes/bookingRoutes.js";
-// import { stripeWebHooks } from "./controllers/stripeWebHooks.js";
+import { stripeWebHooks } from "./controllers/stripeWebHooks.js";
 const PORT = process.env.PORT || 3000;
 // Database connection
 connectDB();
