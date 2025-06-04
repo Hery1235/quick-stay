@@ -143,31 +143,17 @@ export const getHotelBooking = async (req, res) => {
   }
 };
 
+// Payment
+
 export const stripePayment = async (req, res) => {
   try {
     const { bookingId } = req.body;
 
     const booking = await Booking.findById(bookingId);
-
-    if (!booking) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Booking not found" });
-    }
-
     const roomData = await Room.findById(booking.room).populate("hotel");
-
-    if (!roomData) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Room not found" });
-    }
-
     const totalPrice = booking.totalPrice;
     const { origin } = req.headers;
-
     const stripeInstance = new stripe(process.env.STRIPE_SECRET_KEY);
-
     const line_items = [
       {
         price_data: {
@@ -181,19 +167,18 @@ export const stripePayment = async (req, res) => {
       },
     ];
 
+    // Create checkout session
     const session = await stripeInstance.checkout.sessions.create({
       line_items,
       mode: "payment",
       success_url: `${origin}/loader/my-bookings`,
-      cancel_url: `${origin}/loader/my-bookings`,
+      cancel_url: `${origin}/my-bookings`,
       metadata: {
         bookingId,
       },
     });
-
     res.json({ success: true, url: session.url });
   } catch (error) {
-    console.error("Stripe Payment Error:", error.message);
-    res.status(500).json({ success: false, message: "Payment Failed" });
+    res.json({ success: false, message: "Payment Failed" });
   }
 };

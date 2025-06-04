@@ -6,6 +6,7 @@ import { useEffect } from "react";
 const Loader = () => {
   const { navigate } = useAppContext();
   const { nextUrl } = useParams();
+  console.log("The next url is ", nextUrl);
 
   useEffect(() => {
     if (nextUrl) {
@@ -15,10 +16,10 @@ const Loader = () => {
     }
   }, [nextUrl]);
   return (
-    <div className="flex justify-center items-center h-screen">
+    <div className="flex items-center justify-center h-screen">
       <div
-        className="animate-spin rounded-full h-24 w-24 border-4
-      border-gray-300 border-t-primary"
+        className="animate-spin rounded-full h-24 w-24 border-4 border-gray-300 
+    border-t-primary"
       ></div>
     </div>
   );
